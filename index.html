@@ -300,6 +300,18 @@
     font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
     color: var(--muted); margin-top: 24px; position: relative;
   }
+  .quote-dots {
+    display: flex; gap: 10px; margin-top: 32px; position: relative;
+  }
+  .quote-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); cursor: pointer;
+    transition: background .3s, transform .3s;
+  }
+  .quote-dot.active { background: var(--accent); transform: scale(1.4); }
+  .quote-text, .quote-attr { transition: opacity .5s, transform .5s; }
+  .quote-fade-out { opacity: 0 !important; transform: translateY(12px) !important; }
+  .quote-fade-in  { opacity: 1 !important; transform: translateY(0)   !important; }
 
   /* Learning */
   .learning { padding: 100px 48px; border-top: 1px solid var(--border); }
@@ -386,6 +398,23 @@
     font-family: 'Cormorant Garant', serif;
     font-size: 1.2rem; font-weight: 300; font-style: italic;
   }
+  .contact-link {
+    color: var(--fg); text-decoration: none;
+    border-bottom: 1px solid rgba(0,255,136,.25);
+    transition: color .3s, border-color .3s;
+  }
+  .contact-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Chess modal stat row */
+  .chess-stat-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid #1a1a1a; padding: 12px 0;
+  }
+  .chess-stat-row:last-child { border-bottom: none; }
+  .chess-stat-label { font-size:.55rem; letter-spacing:.15em; text-transform:uppercase; color:#666; }
+  .chess-stat-val   { font-family:'Cormorant Garant',serif; font-size:1.4rem; font-weight:300; color:#f0ede6; }
+  .chess-stat-val em { color:#00ff88; font-style:normal; }
+  .chess-modal-open { overflow:hidden; }
 
   /* Footer */
   footer {
@@ -687,7 +716,7 @@
     </div>
 
     <!-- Chess -->
-    <div class="interest-card reveal reveal-delay-1">
+    <div class="interest-card reveal reveal-delay-1" id="chessCard" style="cursor:none;">
       <div class="interest-visual">
         <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
           <rect width="400" height="260" fill="#0d0a06"/>
@@ -742,6 +771,8 @@
             <rect x="88" y="110" width="22" height="22" fill="#00ff88" opacity="0.1"/>
           </g>
           <text x="130" y="215" font-family="monospace" font-size="7" fill="#c9b99a" opacity="0.4">STRATEGY · PATTERN · DEPTH</text>
+          <!-- Click hint -->
+          <text x="130" y="250" font-family="monospace" font-size="7" fill="#00ff88" opacity="0.5">[ click to view stats ]</text>
         </svg>
       </div>
       <div class="interest-overlay">
@@ -750,6 +781,22 @@
         <div class="interest-desc">Strategy, pattern recognition, deep thinking. Chess sharpens the mind the same way debugging does.</div>
       </div>
       <div class="interest-tag">strategy</div>
+    </div>
+
+    <!-- Chess Stats Modal -->
+    <div id="chessModal" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+      <div style="background:#0d0d0d; border:1px solid #1a1a1a; max-width:480px; width:90%; padding:40px 36px; position:relative; font-family:'JetBrains Mono',monospace;">
+        <!-- Close -->
+        <button id="chessModalClose" style="position:absolute;top:16px;right:20px;background:none;border:none;color:#666;font-size:1.2rem;cursor:pointer;font-family:inherit;">✕</button>
+        <!-- Header -->
+        <div style="font-size:.55rem;letter-spacing:.2em;color:#00ff88;margin-bottom:6px;text-transform:uppercase;">// chess.com</div>
+        <div style="font-family:'Cormorant Garant',serif;font-size:2rem;font-weight:300;font-style:italic;color:#f0ede6;margin-bottom:4px;">duskull7</div>
+        <a href="https://www.chess.com/member/duskull7" target="_blank" rel="noopener" style="font-size:.55rem;color:#666;text-decoration:none;letter-spacing:.1em;border-bottom:1px solid #222;">chess.com/member/duskull7 ↗</a>
+        <!-- Stats content -->
+        <div id="chessStatsContent" style="margin-top:28px;">
+          <div style="color:#444;font-size:.65rem;">loading stats...</div>
+        </div>
+      </div>
     </div>
 
     <!-- Badminton -->
@@ -802,9 +849,10 @@
 </section>
 
 <!-- QUOTE BREAK -->
-<div class="quote-break">
-  <p class="quote-text reveal">"The quieter you become,<br/>the more you are able to <em>hear</em>"</p>
-  <p class="quote-attr reveal reveal-delay-1">// Kali Linux Motto</p>
+<div class="quote-break" id="quoteBreak">
+  <p class="quote-text reveal" id="quoteText">"The quieter you become,<br/>the more you are able to <em>hear</em>"</p>
+  <p class="quote-attr reveal reveal-delay-1" id="quoteAttr">// Kali Linux Motto</p>
+  <div class="quote-dots reveal reveal-delay-2" id="quoteDots"></div>
 </div>
 
 <!-- TERMINAL + LEARNING -->
@@ -880,9 +928,9 @@
       <text font-family="monospace" font-size="9" fill="#00ff88" opacity="0.5">
         <tspan x="20" dy="50">root@utsab:~# ./connect.sh</tspan>
         <tspan x="20" dy="16" opacity="0.35">[*] Initializing connection...</tspan>
-        <tspan x="20" dy="16" opacity="0.35">[*] Resolving hostname...</tspan>
-        <tspan x="20" dy="16" opacity="0.35">[+] Connection established</tspan>
-        <tspan x="20" dy="16" opacity="0.3">[*] Ready to collaborate</tspan>
+        <tspan x="20" dy="16" opacity="0.35">[+] email: shahutsab071@gmail.com</tspan>
+        <tspan x="20" dy="16" opacity="0.35">[+] phone: +977 9716046995</tspan>
+        <tspan x="20" dy="16" opacity="0.3">[+] github: github.com/usoop071</tspan>
         <tspan x="20" dy="24">root@utsab:~# _</tspan>
       </text>
       <circle cx="250" cy="370" r="120" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.15"/>
@@ -903,8 +951,24 @@
       <div class="contact-value">NIST College, Kathmandu</div>
     </div>
     <div class="contact-row reveal reveal-delay-2">
-      <div class="contact-detail">// grade &amp; gpa</div>
-      <div class="contact-value">Class 11 · GPA 3.79</div>
+      <div class="contact-detail">// current grade</div>
+      <div class="contact-value">Class 11</div>
+    </div>
+    <div class="contact-row reveal reveal-delay-2">
+      <div class="contact-detail">// SEE GPA</div>
+      <div class="contact-value">3.79</div>
+    </div>
+    <div class="contact-row reveal reveal-delay-3">
+      <div class="contact-detail">// email</div>
+      <div class="contact-value"><a href="mailto:shahutsab071@gmail.com" class="contact-link">shahutsab071@gmail.com</a></div>
+    </div>
+    <div class="contact-row reveal reveal-delay-3">
+      <div class="contact-detail">// phone</div>
+      <div class="contact-value"><a href="tel:+9779716046995" class="contact-link">+977 9716046995</a></div>
+    </div>
+    <div class="contact-row reveal reveal-delay-3">
+      <div class="contact-detail">// github</div>
+      <div class="contact-value"><a href="https://github.com/usoop071" target="_blank" rel="noopener" class="contact-link">github.com/usoop071</a></div>
     </div>
     <div class="contact-row reveal reveal-delay-3">
       <div class="contact-detail">// find me on</div>
@@ -978,8 +1042,8 @@
     {type:'blank'},
     {type:'prompt',text:'utsab@nist:~$ cat education.txt'},
     {type:'out',text:'School : NIST College, Kathmandu'},
-    {type:'out',text:'Grade  : Class 11'},
-    {type:'out',text:'GPA    : 3.79'},
+    {type:'out',text:'Grade  : Class 11 (current)'},
+    {type:'out',text:'SEE    : GPA 3.79'},
     {type:'blank'},
     {type:'prompt',text:'utsab@nist:~$ ls ~/interests/'},
     {type:'out',text:'linux/  kali/  c-programming/'},
@@ -1007,6 +1071,114 @@
   }
   const tObs=new IntersectionObserver(e=>{if(e[0].isIntersecting){renderLine();tObs.disconnect();}},{threshold:.25});
   tObs.observe(document.querySelector('.terminal'));
+
+  /* Chess Modal */
+  const chessCard  = document.getElementById('chessCard');
+  const chessModal = document.getElementById('chessModal');
+  const chessClose = document.getElementById('chessModalClose');
+  const chessStats = document.getElementById('chessStatsContent');
+  let chessLoaded  = false;
+
+  function openChessModal() {
+    chessModal.style.display = 'flex';
+    document.body.classList.add('chess-modal-open');
+    if (!chessLoaded) fetchChessStats();
+  }
+  function closeChessModal() {
+    chessModal.style.display = 'none';
+    document.body.classList.remove('chess-modal-open');
+  }
+
+  chessCard.addEventListener('click', openChessModal);
+  chessClose.addEventListener('click', closeChessModal);
+  chessModal.addEventListener('click', e => { if (e.target === chessModal) closeChessModal(); });
+
+  async function fetchChessStats() {
+    try {
+      const [profileRes, statsRes] = await Promise.all([
+        fetch('https://api.chess.com/pub/player/duskull7', { headers:{'User-Agent':'utsab-portfolio/1.0 shahutsab071@gmail.com'} }),
+        fetch('https://api.chess.com/pub/player/duskull7/stats', { headers:{'User-Agent':'utsab-portfolio/1.0 shahutsab071@gmail.com'} })
+      ]);
+      const profile = await profileRes.json();
+      const stats   = await statsRes.json();
+
+      const rapid  = stats.chess_rapid;
+      const bullet = stats.chess_bullet;
+      const blitz  = stats.chess_blitz;
+      const puzzles= stats.tactics;
+
+      function rating(obj) {
+        return obj && obj.last && obj.last.rating ? obj.last.rating : '—';
+      }
+      function record(obj) {
+        if (!obj || !obj.record) return '—';
+        const {win=0,loss=0,draw=0} = obj.record;
+        return `${win}W / ${loss}L / ${draw}D`;
+      }
+
+      const joined = profile.joined ? new Date(profile.joined*1000).getFullYear() : '—';
+      const online = profile.last_online ? new Date(profile.last_online*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      const followers = profile.followers ?? '—';
+      const bestRapid = rapid && rapid.best ? rapid.best.rating : '—';
+
+      chessStats.innerHTML = `
+        <div class="chess-stat-row"><span class="chess-stat-label">// rapid rating</span><span class="chess-stat-val">${rating(rapid)}</span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// rapid best</span><span class="chess-stat-val"><em>${bestRapid}</em></span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// rapid record</span><span class="chess-stat-val" style="font-size:1rem;">${record(rapid)}</span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// blitz rating</span><span class="chess-stat-val">${rating(blitz)}</span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// bullet rating</span><span class="chess-stat-val">${rating(bullet)}</span></div>
+        ${puzzles ? `<div class="chess-stat-row"><span class="chess-stat-label">// puzzle rating</span><span class="chess-stat-val">${rating(puzzles)}</span></div>` : ''}
+        <div class="chess-stat-row"><span class="chess-stat-label">// followers</span><span class="chess-stat-val">${followers}</span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// member since</span><span class="chess-stat-val" style="font-size:1rem;">${joined}</span></div>
+        <div class="chess-stat-row"><span class="chess-stat-label">// last online</span><span class="chess-stat-val" style="font-size:.9rem;">${online}</span></div>
+        <div style="margin-top:20px;">
+          <a href="https://www.chess.com/member/duskull7" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#00ff88;text-decoration:none;border:1px solid rgba(0,255,136,.3);padding:12px 20px;transition:background .3s;">
+            View full profile ↗
+          </a>
+        </div>
+      `;
+      chessLoaded = true;
+    } catch(err) {
+      chessStats.innerHTML = `<div style="color:#666;font-size:.65rem;">Could not load stats. <a href="https://www.chess.com/member/duskull7" target="_blank" rel="noopener" style="color:#00ff88;">View on chess.com ↗</a></div>`;
+    }
+  }
+
+  /* Rotating Quotes */
+  const quotes = [
+    { text: '"The quieter you become,<br/>the more you are able to <em>hear</em>"', attr: '// Kali Linux Motto' },
+    { text: '"The only way to do great work<br/>is to <em>love</em> what you do"', attr: '// Steve Jobs' },
+    { text: '"Any sufficiently advanced technology<br/>is indistinguishable from <em>magic</em>"', attr: '// Arthur C. Clarke' },
+    { text: '"Talk is cheap.<br/>Show me the <em>code</em>"', attr: '// Linus Torvalds' },
+    { text: '"It does not matter how slowly you go<br/>as long as you do not <em>stop</em>"', attr: '// Confucius' },
+    { text: '"First, solve the problem.<br/>Then, write the <em>code</em>"', attr: '// John Johnson' },
+  ];
+  let qIdx = 0;
+  const qText = document.getElementById('quoteText');
+  const qAttr = document.getElementById('quoteAttr');
+  const qDots = document.getElementById('quoteDots');
+
+  quotes.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'quote-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => switchQuote(i));
+    qDots.appendChild(d);
+  });
+
+  function switchQuote(idx) {
+    qText.classList.add('quote-fade-out');
+    qAttr.classList.add('quote-fade-out');
+    setTimeout(() => {
+      qIdx = idx;
+      qText.innerHTML = quotes[qIdx].text;
+      qAttr.textContent = quotes[qIdx].attr;
+      document.querySelectorAll('.quote-dot').forEach((d, i) => d.classList.toggle('active', i === qIdx));
+      qText.classList.remove('quote-fade-out');
+      qAttr.classList.remove('quote-fade-out');
+    }, 500);
+  }
+
+  setInterval(() => switchQuote((qIdx + 1) % quotes.length), 5000);
 
   /* Reveals */
   const rObs=new IntersectionObserver(e=>{

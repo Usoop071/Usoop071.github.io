@@ -1,240 +1,1018 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Utsab Hacket - Ultimate Portfolio</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Utsab Shah — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-font-family:Arial,sans-serif;
-background:#050816;
-color:white;
-overflow-x:hidden;
-}
-#matrix{
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-z-index:-1;
-}
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-}
-.hero h1{
-font-size:5rem;
-text-shadow:0 0 30px cyan;
-animation:float 4s ease-in-out infinite;
-}
-.typing{
-font-size:1.5rem;
-color:#67e8f9;
-margin-top:10px;
-}
-@keyframes float{
-50%{transform:translateY(-12px)}
-}
-.section{
-max-width:1200px;
-margin:auto;
-padding:70px 20px;
-}
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-.card{
-background:rgba(255,255,255,.06);
-backdrop-filter:blur(12px);
-border-radius:20px;
-padding:25px;
-border:1px solid rgba(255,255,255,.1);
-transition:.5s;
-position:relative;
-overflow:hidden;
-opacity:0;
-transform:translateY(60px);
-}
-.card.show{
-opacity:1;
-transform:translateY(0);
-}
-.card::before{
-content:"";
-position:absolute;
-width:250%;
-height:250%;
-top:-120%;
-left:-120%;
-background:linear-gradient(45deg,transparent,rgba(0,255,255,.15),transparent);
-transition:.8s;
-}
-.card:hover::before{
-top:-40%;
-left:-40%;
-}
-.card:hover{
-transform:translateY(-15px) scale(1.05);
-box-shadow:0 0 40px cyan;
-}
-h2{
-margin-bottom:20px;
-color:#7dd3fc;
-}
-.terminal{
-background:#000;
-color:#00ff66;
-font-family:monospace;
-padding:25px;
-border-radius:15px;
-border:1px solid #00ff66;
-box-shadow:0 0 20px rgba(0,255,100,.3);
-}
-.counter{
-font-size:2rem;
-color:cyan;
-font-weight:bold;
-}
-footer{
-text-align:center;
-padding:40px;
-opacity:.8;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:     #0a0a0a;
+    --fg:     #f0ede6;
+    --muted:  #666;
+    --accent: #00ff88;
+    --border: #1a1a1a;
+  }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Cursor */
+  .cursor {
+    position: fixed; top: 0; left: 0;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(0,255,136,0.3);
+    border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: width .3s, height .3s, border-color .3s;
+  }
+  .cursor-ring.expand { width: 64px; height: 64px; border-color: var(--accent); }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 48px;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%);
+  }
+  .nav-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; text-decoration: none; color: var(--accent);
+  }
+  .nav-logo span { color: var(--fg); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: .65rem; letter-spacing: .15em; text-transform: uppercase;
+    text-decoration: none; color: var(--muted); transition: color .3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Hero — pure CSS background */
+  .hero {
+    height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: #0a0a0a;
+  }
+  /* Animated grid */
+  .hero-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    from { transform: translateY(0); }
+    to   { transform: translateY(60px); }
+  }
+  /* Radial glow */
+  .hero-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 65% 40%, rgba(0,255,136,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,100,255,0.05) 0%, transparent 60%);
+  }
+  /* Scanlines */
+  .hero-scan {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+    );
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem; letter-spacing: .2em;
+    color: var(--accent); margin-bottom: 20px; position: relative; z-index: 2;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(3.5rem, 9vw, 8.5rem);
+    font-weight: 300; line-height: .88; letter-spacing: -.02em;
+    position: relative; z-index: 2; max-width: 820px;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    margin-top: 28px; font-family: 'JetBrains Mono', monospace;
+    font-size: .68rem; color: var(--muted); position: relative; z-index: 2;
+  }
+  .hero-typing {
+    margin-top: 8px; font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem; color: var(--accent); position: relative; z-index: 2; min-height: 1.2em;
+  }
+  .hero-typing::after { content: '█'; animation: blink 1s step-end infinite; opacity:.8; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .hero-scroll {
+    position: absolute; right: 48px; bottom: 60px; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .55rem; letter-spacing: .2em; color: var(--muted);
+  }
+  .hero-scroll::after {
+    content: ''; display: block; width: 1px; height: 48px;
+    background: var(--accent); opacity: .4;
+    animation: scrollLine 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%   { transform: scaleY(0); transform-origin: top; }
+    50%  { transform: scaleY(1); transform-origin: top; }
+    51%  { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* Stats */
+  .stats-band {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    border-top: 1px solid var(--border);
+  }
+  .stat-block {
+    padding: 44px 36px; border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .stat-block:last-child { border-right: none; }
+  .stat-block::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--accent); transform: scaleX(0); transform-origin: left;
+    transition: transform .5s;
+  }
+  .stat-block:hover::after { transform: scaleX(1); }
+  .stat-value {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 3.2rem; font-weight: 300; color: var(--fg);
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--muted); margin-top: 8px;
+  }
+
+  /* Marquee */
+  .marquee-wrap {
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 18px 0; overflow: hidden; white-space: nowrap;
+  }
+  .marquee-track { display: inline-flex; animation: marquee 24s linear infinite; }
+  .marquee-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; color: var(--muted); padding: 0 40px;
+  }
+  .marquee-sep { color: var(--accent); }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Section label */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 56px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .section-label::before { content: '//'; font-size: .7rem; color: var(--muted); }
+
+  /* About */
+  .about {
+    padding: 120px 48px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    border-top: 1px solid var(--border);
+  }
+  .about-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(2.4rem, 5vw, 4.5rem); font-weight: 300; line-height: 1.05; margin-bottom: 40px;
+  }
+  .about-title em { font-style: italic; color: var(--accent); }
+
+  /* SVG-based image panels */
+  .about-mosaic {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 3px;
+  }
+  .img-panel {
+    position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+  .img-panel svg { width: 100%; height: 100%; display: block; }
+  .img-panel.tall { grid-row: 1/3; min-height: 420px; }
+  .img-panel.short { min-height: 205px; }
+
+  .about-body {
+    font-size: .88rem; line-height: 1.9; color: rgba(240,237,230,.65); margin-bottom: 28px;
+  }
+  .about-cta {
+    display: inline-flex; align-items: center; gap: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .65rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid rgba(0,255,136,.3); padding: 14px 24px;
+    transition: background .3s, border-color .3s;
+  }
+  .about-cta:hover { background: rgba(0,255,136,.07); border-color: var(--accent); }
+  .about-cta::after { content: '→'; }
+
+  /* Interests */
+  .interests { padding: 100px 48px; border-top: 1px solid var(--border); }
+  .interests-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; margin-top: 56px;
+  }
+  .interest-card {
+    position: relative; overflow: hidden; cursor: none;
+  }
+  .interest-visual {
+    width: 100%; height: 260px; display: block; position: relative;
+    transition: transform .6s cubic-bezier(.23,1,.32,1);
+  }
+  .interest-card:hover .interest-visual { transform: scale(1.04); }
+  .interest-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 24px 22px;
+    background: linear-gradient(to top, rgba(10,10,10,.92) 0%, rgba(10,10,10,.1) 55%);
+  }
+  .interest-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .interest-name {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.35rem; font-weight: 300; font-style: italic; color: var(--fg); margin-bottom: 6px;
+  }
+  .interest-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem; line-height: 1.7; color: rgba(0,255,136,0);
+    transition: color .4s; letter-spacing: .02em;
+  }
+  .interest-card:hover .interest-desc { color: rgba(0,255,136,.8); }
+  .interest-tag {
+    position: absolute; top: 16px; right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .52rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid rgba(0,255,136,.4); padding: 4px 10px;
+    opacity: 0; transition: opacity .4s;
+    background: rgba(10,10,10,.6);
+  }
+  .interest-card:hover .interest-tag { opacity: 1; }
+
+  /* Quote break */
+  .quote-break {
+    padding: 100px 48px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .quote-break::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,255,136,0.05) 0%, transparent 70%),
+      repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+      );
+  }
+  .quote-text {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(1.8rem, 4vw, 3.5rem); font-weight: 300; font-style: italic;
+    color: var(--fg); max-width: 680px; line-height: 1.2; position: relative;
+  }
+  .quote-text em { color: var(--accent); font-style: normal; }
+  .quote-attr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); margin-top: 24px; position: relative;
+  }
+
+  /* Learning */
+  .learning { padding: 100px 48px; border-top: 1px solid var(--border); }
+  .learning-inner {
+    margin-top: 56px;
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 3px;
+  }
+  .terminal-bar {
+    background: #111; padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); border-bottom: none;
+  }
+  .td { width: 10px; height: 10px; border-radius: 50%; }
+  .td.r { background: #ff5f57; } .td.y { background: #febc2e; } .td.g { background: #28c840; }
+  .t-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem; color: var(--muted); margin-left: 8px;
+  }
+  .terminal {
+    background: #050505; color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+    padding: 28px 28px 36px; line-height: 2;
+    border: 1px solid var(--border); min-height: 360px;
+  }
+  .t-prompt { color: var(--accent); }
+  .t-out    { color: rgba(240,237,230,.5); }
+  .t-cursor {
+    display: inline-block; width: 7px; height: 1em;
+    background: var(--accent); vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Right side SVG panels */
+  .learning-visuals { display: grid; grid-template-rows: 1fr 1fr; gap: 3px; }
+  .lv-panel { position: relative; overflow: hidden; min-height: 178px; }
+  .lv-panel svg { width: 100%; height: 100%; display: block; }
+
+  /* Learning cards */
+  .learning-cards {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 3px; margin-top: 3px;
+  }
+  .learning-card {
+    border: 1px solid var(--border); padding: 32px 24px;
+    transition: border-color .3s, background .3s;
+  }
+  .learning-card:hover { border-color: rgba(0,255,136,.4); background: rgba(0,255,136,.03); }
+  .learning-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem; color: var(--accent); margin-bottom: 16px; opacity: .6;
+  }
+  .learning-text {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.15rem; font-weight: 300; font-style: italic; line-height: 1.4;
+  }
+
+  /* Contact */
+  .contact {
+    border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 65vh;
+  }
+  .contact-visual { position: relative; overflow: hidden; }
+  .contact-visual svg { width: 100%; height: 100%; display: block; }
+  .contact-content {
+    padding: 80px 64px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .contact-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 28px;
+  }
+  .contact-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: clamp(2.5rem, 5vw, 5rem); font-weight: 300;
+    line-height: .95; margin-bottom: 48px;
+  }
+  .contact-title em { font-style: italic; color: var(--accent); }
+  .contact-row { margin-bottom: 28px; }
+  .contact-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .58rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .contact-value {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 1.2rem; font-weight: 300; font-style: italic;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border); padding: 24px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--muted); }
+  .footer-tag  { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: rgba(0,255,136,.35); }
+
+  /* Reveals */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .9s cubic-bezier(.23,1,.32,1), transform .9s cubic-bezier(.23,1,.32,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .22s; }
+  .reveal-delay-3 { transition-delay: .35s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; } .nav-links { display: none; }
+    .hero { padding: 0 20px 48px; } .hero-scroll { display: none; }
+    .stats-band { grid-template-columns: 1fr 1fr; }
+    .stat-block { border: none; border-bottom: 1px solid var(--border); padding: 28px 20px; }
+    .about { grid-template-columns: 1fr; padding: 72px 20px; gap: 40px; }
+    .interests { padding: 72px 20px; }
+    .interests-grid { grid-template-columns: 1fr 1fr; }
+    .learning { padding: 72px 20px; }
+    .learning-inner { grid-template-columns: 1fr; }
+    .learning-cards { grid-template-columns: 1fr 1fr; }
+    .contact { grid-template-columns: 1fr; }
+    .contact-visual { display: none; }
+    .contact-content { padding: 60px 20px; }
+    footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
+    body { cursor: auto; } .cursor,.cursor-ring { display: none; }
+    .interest-desc { color: rgba(0,255,136,.7); }
+    .interest-tag { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 
-<canvas id="matrix"></canvas>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
+<nav>
+  <a class="nav-logo" href="#"><span>~/</span>utsab_shah</a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#interests">interests</a></li>
+    <li><a href="#learning">learning</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
 <section class="hero">
-<h1>UTSAB SHAH</h1>
-<div class="typing" id="typing"></div>
-<p>Class 11 • GPA 3.79 • NIST College</p>
+  <div class="hero-bg"></div>
+  <div class="hero-scan"></div>
+  <p class="hero-eyebrow">// Class 11 · NIST College · Kathmandu, NP</p>
+  <h1 class="hero-title">Utsab<br/><em>Shah</em></h1>
+  <p class="hero-sub">$ interests --list  →  linux · security · c · networking</p>
+  <p class="hero-typing" id="typing"></p>
+  <div class="hero-scroll">scroll</div>
 </section>
 
-<section class="section">
-<div class="grid">
-<div class="card"><div class="counter">3.79</div> GPA</div>
-<div class="card"><div class="counter">11</div> Current Grade</div>
-<div class="card"><div class="counter">∞</div> Curiosity Level</div>
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stat-block reveal"><div class="stat-value">3.79</div><div class="stat-label">// GPA</div></div>
+  <div class="stat-block reveal reveal-delay-1"><div class="stat-value">11</div><div class="stat-label">// Current Grade</div></div>
+  <div class="stat-block reveal reveal-delay-2"><div class="stat-value">6+</div><div class="stat-label">// Domains</div></div>
+  <div class="stat-block reveal reveal-delay-3"><div class="stat-value">∞</div><div class="stat-label">// Curiosity</div></div>
 </div>
-</section>
 
-<section class="section">
-<h2>About Me</h2>
-<div class="card">
-I am Utsab, a student from NIST College. I enjoy exploring Linux, cybersecurity,
-programming, networking and mathematics. My goal is to become highly skilled in technology
-while continuously learning and building new projects.
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">linux</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">kali linux</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">c programming</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">cybersecurity</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">networking</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">chess</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">badminton</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">calculus</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">linux</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">kali linux</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">c programming</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">cybersecurity</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">networking</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">chess</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">badminton</span><span class="marquee-sep"> · </span>
+    <span class="marquee-item">calculus</span><span class="marquee-sep"> · </span>
+  </div>
 </div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="reveal">
+    <div class="section-label">About</div>
+    <h2 class="about-title">Curious mind,<br/><em>relentless<br/>learner</em></h2>
+    <div class="about-mosaic">
+      <!-- Panel 1: Matrix rain -->
+      <div class="img-panel tall">
+        <svg viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg" id="matrixSvg">
+          <rect width="200" height="420" fill="#050a05"/>
+          <text font-family="monospace" font-size="11" fill="#00ff88" opacity="0.8" id="matrixText"></text>
+        </svg>
+      </div>
+      <!-- Panel 2: Network nodes -->
+      <div class="img-panel short">
+        <svg viewBox="0 0 200 205" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="205" fill="#040408"/>
+          <g stroke="#00aaff" stroke-width="0.5" opacity="0.4">
+            <line x1="30" y1="40" x2="100" y2="80"/><line x1="100" y1="80" x2="170" y2="30"/>
+            <line x1="100" y1="80" x2="60" y2="140"/><line x1="60" y1="140" x2="150" y2="160"/>
+            <line x1="170" y1="30" x2="150" y2="160"/><line x1="30" y1="40" x2="60" y2="140"/>
+            <line x1="100" y1="80" x2="150" y2="160"/><line x1="170" y1="30" x2="60" y2="140"/>
+          </g>
+          <circle cx="30" cy="40" r="4" fill="#00aaff" opacity="0.8"/>
+          <circle cx="100" cy="80" r="6" fill="#00ff88" opacity="0.9"/>
+          <circle cx="170" cy="30" r="4" fill="#00aaff" opacity="0.8"/>
+          <circle cx="60" cy="140" r="4" fill="#00aaff" opacity="0.8"/>
+          <circle cx="150" cy="160" r="5" fill="#00ff88" opacity="0.7"/>
+          <text x="10" y="195" font-family="monospace" font-size="7" fill="#00aaff" opacity="0.5">NETWORK TOPOLOGY</text>
+        </svg>
+      </div>
+      <!-- Panel 3: Lock/security -->
+      <div class="img-panel short">
+        <svg viewBox="0 0 200 205" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="205" fill="#080408"/>
+          <rect x="65" y="95" width="70" height="55" rx="4" fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.7"/>
+          <path d="M80 95 V75 A20 20 0 0 1 120 75 V95" fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.7"/>
+          <circle cx="100" cy="122" r="6" fill="#00ff88" opacity="0.9"/>
+          <rect x="98" y="122" width="4" height="10" rx="2" fill="#00ff88" opacity="0.9"/>
+          <circle cx="100" cy="102" r="30" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.2"/>
+          <circle cx="100" cy="102" r="50" fill="none" stroke="#00ff88" stroke-width="0.3" opacity="0.1"/>
+          <text x="50" y="175" font-family="monospace" font-size="7" fill="#00ff88" opacity="0.5">CYBERSECURITY</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="reveal reveal-delay-2" style="padding-top:10px">
+    <p class="about-body">I am Utsab, a Class 11 student at NIST College, Kathmandu. I'm drawn to the layers beneath technology — how systems communicate, how security breaks (and holds), how a few lines of C can command a machine.</p>
+    <p class="about-body">I explore Linux not just as a tool but as a philosophy of openness. Kali Linux is my playground for understanding how attackers think — because you can't defend what you don't understand.</p>
+    <p class="about-body">Outside the terminal, you'll find me studying calculus, playing chess, or on the badminton court. My goal: become highly skilled in technology while never stopping to build and learn.</p>
+    <a class="about-cta" href="#contact">Get in touch</a>
+  </div>
 </section>
 
-<section class="section">
-<h2>Interests</h2>
-<div class="grid">
-<div class="card">♟️ Chess</div>
-<div class="card">🏸 Badminton</div>
-<div class="card">🐧 Linux & Kali Linux</div>
-<div class="card">💻 C Programming</div>
-<div class="card">🔐 Cybersecurity</div>
-<div class="card">🌐 Networking</div>
+<!-- INTERESTS -->
+<section class="interests" id="interests">
+  <div class="section-label reveal">Interests</div>
+  <div class="interests-grid">
+
+    <!-- Linux -->
+    <div class="interest-card reveal">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#020c02"/>
+          <rect x="0" y="0" width="400" height="260" fill="url(#termGrad)"/>
+          <defs>
+            <linearGradient id="termGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#020c02"/>
+              <stop offset="100%" stop-color="#010801"/>
+            </linearGradient>
+          </defs>
+          <text font-family="monospace" font-size="9" fill="#00ff44" opacity="0.9">
+            <tspan x="16" dy="20">root@kali:~# uname -a</tspan>
+            <tspan x="16" dy="14" opacity="0.6">Linux kali 6.1.0 #1 SMP x86_64 GNU/Linux</tspan>
+            <tspan x="16" dy="14">root@kali:~# ls /</tspan>
+            <tspan x="16" dy="14" opacity="0.6">bin  boot  dev  etc  home  lib  proc  root</tspan>
+            <tspan x="16" dy="14">root@kali:~# whoami</tspan>
+            <tspan x="16" dy="14" opacity="0.6">root</tspan>
+            <tspan x="16" dy="14">root@kali:~# nmap -sV 192.168.1.0/24</tspan>
+            <tspan x="16" dy="14" opacity="0.6">Starting Nmap 7.94 ...</tspan>
+            <tspan x="16" dy="14" opacity="0.5">Scanning 256 hosts [2 ports/host]</tspan>
+            <tspan x="16" dy="14">root@kali:~# █</tspan>
+          </text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">🐧</span>
+        <div class="interest-name">Linux &amp; Kali</div>
+        <div class="interest-desc">Installing, customising, and living inside Linux. Kali for security research and exploration.</div>
+      </div>
+      <div class="interest-tag">sys / os</div>
+    </div>
+
+    <!-- Cybersecurity -->
+    <div class="interest-card reveal reveal-delay-1">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#020408"/>
+          <!-- Shield -->
+          <path d="M200 30 L260 60 L260 130 Q260 180 200 210 Q140 180 140 130 L140 60 Z"
+            fill="none" stroke="#0088ff" stroke-width="1.5" opacity="0.6"/>
+          <path d="M200 50 L245 70 L245 128 Q245 168 200 192 Q155 168 155 128 L155 70 Z"
+            fill="rgba(0,136,255,0.05)" stroke="#0088ff" stroke-width="0.8" opacity="0.4"/>
+          <!-- Checkmark inside shield -->
+          <polyline points="180,130 195,148 225,112" fill="none" stroke="#00ff88" stroke-width="2.5" opacity="0.9"/>
+          <!-- Orbiting dots -->
+          <circle cx="200" cy="120" r="70" fill="none" stroke="#0044aa" stroke-width="0.4" stroke-dasharray="3 6" opacity="0.4"/>
+          <circle cx="270" cy="120" r="4" fill="#00ff88" opacity="0.8"/>
+          <!-- Binary rain background -->
+          <text font-family="monospace" font-size="7" fill="#001133" opacity="0.8">
+            <tspan x="10" dy="18">01001000 01000001 01000011 01001011</tspan>
+            <tspan x="10" dy="10">11001010 00110101 10110010 01110100</tspan>
+            <tspan x="10" dy="10">00101011 11010010 01001101 10100111</tspan>
+            <tspan x="10" dy="10">10110100 01010101 00111010 11001001</tspan>
+          </text>
+          <text x="145" y="240" font-family="monospace" font-size="8" fill="#0088ff" opacity="0.5">ENCRYPTED · SECURE · PROTECTED</text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">🔐</span>
+        <div class="interest-name">Cybersecurity</div>
+        <div class="interest-desc">Ethical hacking, threat analysis, protocols. Understanding attacks to build better defenses.</div>
+      </div>
+      <div class="interest-tag">security</div>
+    </div>
+
+    <!-- C Programming -->
+    <div class="interest-card reveal reveal-delay-2">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#080808"/>
+          <text font-family="monospace" font-size="8.5" fill="#569cd6">
+            <tspan x="12" dy="22" fill="#c586c0">#include </tspan><tspan fill="#ce9178">&lt;stdio.h&gt;</tspan>
+            <tspan x="12" dy="13" fill="#c586c0">#include </tspan><tspan fill="#ce9178">&lt;stdlib.h&gt;</tspan>
+            <tspan x="12" dy="13"> </tspan>
+            <tspan x="12" dy="13" fill="#569cd6">int </tspan><tspan fill="#dcdcaa">main</tspan><tspan fill="#ffd700">()</tspan><tspan fill="#cccccc"> {</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">  </tspan><tspan fill="#569cd6">int </tspan><tspan fill="#9cdcfe">*ptr</tspan><tspan fill="#cccccc"> = </tspan><tspan fill="#dcdcaa">malloc</tspan><tspan fill="#ffd700">(</tspan><tspan fill="#b5cea8">256</tspan><tspan fill="#ffd700">)</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">  </tspan><tspan fill="#569cd6">if </tspan><tspan fill="#ffd700">(</tspan><tspan fill="#9cdcfe">ptr</tspan><tspan fill="#cccccc"> == </tspan><tspan fill="#569cd6">NULL</tspan><tspan fill="#ffd700">)</tspan><tspan fill="#cccccc"> {</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">    </tspan><tspan fill="#dcdcaa">perror</tspan><tspan fill="#ffd700">(</tspan><tspan fill="#ce9178">"malloc"</tspan><tspan fill="#ffd700">)</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">    </tspan><tspan fill="#569cd6">return </tspan><tspan fill="#b5cea8">1</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">  }</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">  </tspan><tspan fill="#dcdcaa">printf</tspan><tspan fill="#ffd700">(</tspan><tspan fill="#ce9178">"addr: %p\n"</tspan><tspan fill="#cccccc">, </tspan><tspan fill="#9cdcfe">ptr</tspan><tspan fill="#ffd700">)</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">  </tspan><tspan fill="#dcdcaa">free</tspan><tspan fill="#ffd700">(</tspan><tspan fill="#9cdcfe">ptr</tspan><tspan fill="#ffd700">)</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#569cd6">  return </tspan><tspan fill="#b5cea8">0</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="12" dy="13" fill="#cccccc">}</tspan>
+          </text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">💻</span>
+        <div class="interest-name">C Programming</div>
+        <div class="interest-desc">Low-level programming, memory management, pointers — as close to the machine as possible.</div>
+      </div>
+      <div class="interest-tag">low-level</div>
+    </div>
+
+    <!-- Networking -->
+    <div class="interest-card reveal">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#030508"/>
+          <!-- Nodes -->
+          <g>
+            <line x1="200" y1="130" x2="80" y2="60"  stroke="#00aaff" stroke-width="0.7" opacity="0.4"/>
+            <line x1="200" y1="130" x2="320" y2="60"  stroke="#00aaff" stroke-width="0.7" opacity="0.4"/>
+            <line x1="200" y1="130" x2="60" y2="190"  stroke="#00aaff" stroke-width="0.7" opacity="0.4"/>
+            <line x1="200" y1="130" x2="340" y2="190" stroke="#00aaff" stroke-width="0.7" opacity="0.4"/>
+            <line x1="200" y1="130" x2="200" y2="30"  stroke="#00aaff" stroke-width="0.7" opacity="0.4"/>
+            <line x1="80" y1="60"  x2="320" y2="60"  stroke="#00aaff" stroke-width="0.3" opacity="0.2"/>
+            <line x1="60" y1="190" x2="340" y2="190" stroke="#00aaff" stroke-width="0.3" opacity="0.2"/>
+          </g>
+          <!-- Packets traveling -->
+          <circle r="3" fill="#00ff88" opacity="0.9">
+            <animateMotion dur="2s" repeatCount="indefinite" path="M200,130 L80,60"/>
+          </circle>
+          <circle r="3" fill="#00ff88" opacity="0.9">
+            <animateMotion dur="2.5s" repeatCount="indefinite" path="M200,130 L320,60"/>
+          </circle>
+          <circle r="3" fill="#00aaff" opacity="0.9">
+            <animateMotion dur="3s" repeatCount="indefinite" path="M200,130 L340,190"/>
+          </circle>
+          <!-- Node circles -->
+          <circle cx="200" cy="130" r="10" fill="#00ff88" opacity="0.9"/>
+          <circle cx="80"  cy="60"  r="6"  fill="#00aaff" opacity="0.8"/>
+          <circle cx="320" cy="60"  r="6"  fill="#00aaff" opacity="0.8"/>
+          <circle cx="60"  cy="190" r="6"  fill="#00aaff" opacity="0.8"/>
+          <circle cx="340" cy="190" r="6"  fill="#00aaff" opacity="0.8"/>
+          <circle cx="200" cy="30"  r="5"  fill="#00aaff" opacity="0.6"/>
+          <!-- Labels -->
+          <text font-family="monospace" font-size="7" fill="#00aaff" opacity="0.5">
+            <tspan x="12" y="250">TCP/IP · DNS · HTTP · SSH · DHCP · ROUTING</tspan>
+          </text>
+          <text x="185" y="128" font-family="monospace" font-size="6" fill="#0a0a0a" font-weight="bold">HUB</text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">🌐</span>
+        <div class="interest-name">Networking</div>
+        <div class="interest-desc">TCP/IP, routing, protocols, infrastructure. How data moves across the world at machine speed.</div>
+      </div>
+      <div class="interest-tag">infra</div>
+    </div>
+
+    <!-- Chess -->
+    <div class="interest-card reveal reveal-delay-1">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#0d0a06"/>
+          <!-- Chess board -->
+          <g transform="translate(112,20)">
+            <rect width="176" height="176" fill="#1a1208" stroke="#c9b99a" stroke-width="0.5" opacity="0.6"/>
+            <g fill="#c9b99a" opacity="0.25">
+              <rect x="0"  y="0"  width="22" height="22"/>
+              <rect x="44" y="0"  width="22" height="22"/>
+              <rect x="88" y="0"  width="22" height="22"/>
+              <rect x="132"y="0"  width="22" height="22"/>
+              <rect x="22" y="22" width="22" height="22"/>
+              <rect x="66" y="22" width="22" height="22"/>
+              <rect x="110"y="22" width="22" height="22"/>
+              <rect x="154"y="22" width="22" height="22"/>
+              <rect x="0"  y="44" width="22" height="22"/>
+              <rect x="44" y="44" width="22" height="22"/>
+              <rect x="88" y="44" width="22" height="22"/>
+              <rect x="132"y="44" width="22" height="22"/>
+              <rect x="22" y="66" width="22" height="22"/>
+              <rect x="66" y="66" width="22" height="22"/>
+              <rect x="110"y="66" width="22" height="22"/>
+              <rect x="154"y="66" width="22" height="22"/>
+              <rect x="0"  y="88" width="22" height="22"/>
+              <rect x="44" y="88" width="22" height="22"/>
+              <rect x="88" y="88" width="22" height="22"/>
+              <rect x="132"y="88" width="22" height="22"/>
+              <rect x="22" y="110"width="22" height="22"/>
+              <rect x="66" y="110"width="22" height="22"/>
+              <rect x="110"y="110"width="22" height="22"/>
+              <rect x="154"y="110"width="22" height="22"/>
+              <rect x="0"  y="132"width="22" height="22"/>
+              <rect x="44" y="132"width="22" height="22"/>
+              <rect x="88" y="132"width="22" height="22"/>
+              <rect x="132"y="132"width="22" height="22"/>
+              <rect x="22" y="154"width="22" height="22"/>
+              <rect x="66" y="154"width="22" height="22"/>
+              <rect x="110"y="154"width="22" height="22"/>
+              <rect x="154"y="154"width="22" height="22"/>
+            </g>
+            <!-- Pieces -->
+            <text font-family="serif" font-size="18" fill="#f0ede6" opacity="0.9">
+              <tspan x="3"  y="18">♜</tspan><tspan x="47" y="18">♞</tspan><tspan x="91" y="18">♝</tspan><tspan x="135" y="18">♛</tspan>
+              <tspan x="3"  y="40">♟</tspan><tspan x="47" y="40">♟</tspan><tspan x="91" y="40">♟</tspan><tspan x="135" y="40">♟</tspan>
+            </text>
+            <text font-family="serif" font-size="18" fill="#c9b99a" opacity="0.9">
+              <tspan x="3"  y="172">♙</tspan><tspan x="47" y="172">♙</tspan><tspan x="91" y="172">♙</tspan><tspan x="135" y="172">♙</tspan>
+              <tspan x="3"  y="194">♖</tspan><tspan x="47" y="194">♘</tspan><tspan x="91" y="194">♗</tspan><tspan x="135" y="194">♕</tspan>
+            </text>
+            <!-- Move highlight -->
+            <rect x="66" y="88" width="22" height="22" fill="#00ff88" opacity="0.2"/>
+            <rect x="88" y="110" width="22" height="22" fill="#00ff88" opacity="0.1"/>
+          </g>
+          <text x="130" y="215" font-family="monospace" font-size="7" fill="#c9b99a" opacity="0.4">STRATEGY · PATTERN · DEPTH</text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">♟️</span>
+        <div class="interest-name">Chess</div>
+        <div class="interest-desc">Strategy, pattern recognition, deep thinking. Chess sharpens the mind the same way debugging does.</div>
+      </div>
+      <div class="interest-tag">strategy</div>
+    </div>
+
+    <!-- Badminton -->
+    <div class="interest-card reveal reveal-delay-2">
+      <div class="interest-visual">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
+          <rect width="400" height="260" fill="#060a06"/>
+          <!-- Court lines -->
+          <rect x="60" y="40" width="280" height="180" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.3"/>
+          <line x1="200" y1="40" x2="200" y2="220" stroke="#00ff88" stroke-width="0.8" opacity="0.3"/>
+          <line x1="60" y1="130" x2="340" y2="130" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <!-- Net posts -->
+          <line x1="200" y1="40" x2="200" y2="220" stroke="#888" stroke-width="0.5" opacity="0.2"/>
+          <!-- Net -->
+          <g stroke="#aaa" stroke-width="0.5" opacity="0.4">
+            <line x1="60" y1="130" x2="340" y2="130"/>
+            <line x1="70" y1="125" x2="70" y2="135"/><line x1="85" y1="125" x2="85" y2="135"/>
+            <line x1="100" y1="125" x2="100" y2="135"/><line x1="115" y1="125" x2="115" y2="135"/>
+            <line x1="130" y1="125" x2="130" y2="135"/><line x1="145" y1="125" x2="145" y2="135"/>
+            <line x1="160" y1="125" x2="160" y2="135"/><line x1="175" y1="125" x2="175" y2="135"/>
+            <line x1="190" y1="125" x2="190" y2="135"/><line x1="210" y1="125" x2="210" y2="135"/>
+            <line x1="225" y1="125" x2="225" y2="135"/><line x1="240" y1="125" x2="240" y2="135"/>
+            <line x1="255" y1="125" x2="255" y2="135"/><line x1="270" y1="125" x2="270" y2="135"/>
+            <line x1="285" y1="125" x2="285" y2="135"/><line x1="300" y1="125" x2="300" y2="135"/>
+            <line x1="315" y1="125" x2="315" y2="135"/><line x1="330" y1="125" x2="330" y2="135"/>
+          </g>
+          <!-- Shuttlecock arc -->
+          <path d="M280 80 Q200 40 120 170" fill="none" stroke="#00ff88" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>
+          <!-- Shuttlecock -->
+          <circle cx="280" cy="80" r="5" fill="#00ff88" opacity="0.9"/>
+          <path d="M280 75 Q285 65 275 60 Q282 60 285 68 Q290 58 278 55 Q286 57 287 66" fill="#00ff88" opacity="0.5"/>
+          <!-- Racket 1 -->
+          <ellipse cx="300" cy="175" rx="16" ry="22" fill="none" stroke="#c9b99a" stroke-width="1.5" opacity="0.7" transform="rotate(-30 300 175)"/>
+          <line x1="300" y1="195" x2="306" y2="225" stroke="#c9b99a" stroke-width="2" opacity="0.7"/>
+          <!-- Racket 2 -->
+          <ellipse cx="105" cy="90" rx="14" ry="19" fill="none" stroke="#f0ede6" stroke-width="1.5" opacity="0.5" transform="rotate(40 105 90)"/>
+          <line x1="100" y1="105" x2="93" y2="130" stroke="#f0ede6" stroke-width="2" opacity="0.5"/>
+          <text x="125" y="248" font-family="monospace" font-size="7" fill="#00ff88" opacity="0.3">AGILITY · SPEED · REFLEXES</text>
+        </svg>
+      </div>
+      <div class="interest-overlay">
+        <span class="interest-icon">🏸</span>
+        <div class="interest-name">Badminton</div>
+        <div class="interest-desc">Fast reflexes, agility, competition on the court — a necessary counterbalance to screen time.</div>
+      </div>
+      <div class="interest-tag">sport</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- QUOTE BREAK -->
+<div class="quote-break">
+  <p class="quote-text reveal">"The quieter you become,<br/>the more you are able to <em>hear</em>"</p>
+  <p class="quote-attr reveal reveal-delay-1">// Kali Linux Motto</p>
 </div>
+
+<!-- TERMINAL + LEARNING -->
+<section class="learning" id="learning">
+  <div class="section-label reveal">Learning Journey</div>
+  <div class="learning-inner">
+    <div class="reveal">
+      <div class="terminal-bar">
+        <div class="td r"></div><div class="td y"></div><div class="td g"></div>
+        <span class="t-title">utsab@nist:~$</span>
+      </div>
+      <div class="terminal" id="terminal">
+        <span id="term-out"></span><span class="t-cursor"></span>
+      </div>
+    </div>
+    <!-- Right: SVG visual panels -->
+    <div class="learning-visuals reveal reveal-delay-1">
+      <!-- Math/calculus panel -->
+      <div class="lv-panel">
+        <svg viewBox="0 0 300 178" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="178" fill="#06060e"/>
+          <text font-family="serif" font-size="11" fill="#c9b99a" opacity="0.7">
+            <tspan x="20" dy="28">f(x) = x² + 2x + 1</tspan>
+            <tspan x="20" dy="18" font-size="9" fill="#888">d/dx [f(x)] = 2x + 2</tspan>
+            <tspan x="20" dy="18" font-size="9" fill="#888">lim(x→0) sin(x)/x = 1</tspan>
+            <tspan x="20" dy="18" font-size="9" fill="#888">∫ x² dx = x³/3 + C</tspan>
+          </text>
+          <!-- Curve -->
+          <polyline points="20,160 40,148 60,120 80,98 100,88 120,90 140,104 160,128 180,155 200,160"
+            fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.6"/>
+          <text x="210" y="165" font-family="monospace" font-size="7" fill="#c9b99a" opacity="0.3">CALCULUS</text>
+        </svg>
+      </div>
+      <!-- Code editor panel -->
+      <div class="lv-panel">
+        <svg viewBox="0 0 300 178" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="178" fill="#0d0d0d"/>
+          <rect width="300" height="20" fill="#111"/>
+          <circle cx="12" cy="10" r="4" fill="#ff5f57"/><circle cx="26" cy="10" r="4" fill="#febc2e"/><circle cx="40" cy="10" r="4" fill="#28c840"/>
+          <text font-family="monospace" font-size="7.5" fill="#888">
+            <tspan x="10" dy="38" fill="#569cd6">void </tspan><tspan fill="#dcdcaa">swap</tspan><tspan fill="#cccccc">(int *a, int *b) {</tspan>
+            <tspan x="10" dy="13" fill="#569cd6">  int </tspan><tspan fill="#9cdcfe">tmp</tspan><tspan fill="#cccccc"> = *a;</tspan>
+            <tspan x="10" dy="13" fill="#cccccc">  *a = *b;</tspan>
+            <tspan x="10" dy="13" fill="#cccccc">  *b = </tspan><tspan fill="#9cdcfe">tmp</tspan><tspan fill="#cccccc">;</tspan>
+            <tspan x="10" dy="13" fill="#cccccc">}</tspan>
+            <tspan x="10" dy="16" fill="#6a9955">// learning pointers...</tspan>
+          </text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="learning-cards">
+    <div class="learning-card reveal"><div class="learning-num">01</div><div class="learning-text">Pointers &amp; memory management in C</div></div>
+    <div class="learning-card reveal reveal-delay-1"><div class="learning-num">02</div><div class="learning-text">Installing &amp; customising Linux from scratch</div></div>
+    <div class="learning-card reveal reveal-delay-2"><div class="learning-num">03</div><div class="learning-text">Networking concepts &amp; TCP/IP protocols</div></div>
+    <div class="learning-card reveal reveal-delay-3"><div class="learning-num">04</div><div class="learning-text">Derivatives, limits &amp; calculus</div></div>
+  </div>
 </section>
 
-<section class="section">
-<h2>Learning Journey</h2>
-<div class="grid">
-<div class="card">Understanding pointers in C.</div>
-<div class="card">Installing and customizing Linux systems.</div>
-<div class="card">Exploring networking concepts.</div>
-<div class="card">Learning derivatives and calculus.</div>
-</div>
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-visual">
+    <svg viewBox="0 0 500 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <rect width="500" height="600" fill="#050a05"/>
+      <rect width="500" height="600"
+        fill="url(#cgrid)"/>
+      <defs>
+        <pattern id="cgrid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M40 0 L0 0 L0 40" fill="none" stroke="rgba(0,255,136,0.06)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <!-- Big glowing text -->
+      <text font-family="monospace" font-size="9" fill="#00ff88" opacity="0.5">
+        <tspan x="20" dy="50">root@utsab:~# ./connect.sh</tspan>
+        <tspan x="20" dy="16" opacity="0.35">[*] Initializing connection...</tspan>
+        <tspan x="20" dy="16" opacity="0.35">[*] Resolving hostname...</tspan>
+        <tspan x="20" dy="16" opacity="0.35">[+] Connection established</tspan>
+        <tspan x="20" dy="16" opacity="0.3">[*] Ready to collaborate</tspan>
+        <tspan x="20" dy="24">root@utsab:~# _</tspan>
+      </text>
+      <circle cx="250" cy="370" r="120" fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.15"/>
+      <circle cx="250" cy="370" r="85"  fill="none" stroke="#00ff88" stroke-width="0.5" opacity="0.1"/>
+      <circle cx="250" cy="370" r="50"  fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.2"/>
+      <circle cx="250" cy="370" r="18"  fill="rgba(0,255,136,0.15)" stroke="#00ff88" stroke-width="1.5" opacity="0.6"/>
+      <text x="237" y="375" font-family="monospace" font-size="9" fill="#00ff88" opacity="0.9">US</text>
+      <!-- Scan line -->
+      <line x1="130" y1="370" x2="370" y2="370" stroke="#00ff88" stroke-width="0.5" opacity="0.3" stroke-dasharray="4 6"/>
+      <line x1="250" y1="250" x2="250" y2="490" stroke="#00ff88" stroke-width="0.5" opacity="0.3" stroke-dasharray="4 6"/>
+    </svg>
+  </div>
+  <div class="contact-content">
+    <div class="contact-eyebrow reveal">// say hello</div>
+    <h2 class="contact-title reveal reveal-delay-1">Let's build<br/><em>something</em></h2>
+    <div class="contact-row reveal reveal-delay-2">
+      <div class="contact-detail">// school</div>
+      <div class="contact-value">NIST College, Kathmandu</div>
+    </div>
+    <div class="contact-row reveal reveal-delay-2">
+      <div class="contact-detail">// grade &amp; gpa</div>
+      <div class="contact-value">Class 11 · GPA 3.79</div>
+    </div>
+    <div class="contact-row reveal reveal-delay-3">
+      <div class="contact-detail">// find me on</div>
+      <div class="contact-value">GitHub · LinkedIn · Discord</div>
+    </div>
+  </div>
 </section>
 
-<section class="section">
-<h2>Terminal</h2>
-<div class="terminal" id="terminal"></div>
-</section>
-
-<footer>Ultimate Cyber Portfolio • Utsab Hacket</footer>
+<footer>
+  <span class="footer-copy">© 2024 Utsab Shah · NIST College, Kathmandu</span>
+  <span class="footer-tag">$ echo "Learning every day..."</span>
+</footer>
 
 <script>
-const words=["Linux Enthusiast","C Programmer","Cybersecurity Learner","Chess Player","Badminton Enthusiast"];
-let i=0,j=0,d=false;
-setInterval(()=>{
-let w=words[i];
-document.getElementById("typing").textContent=w.substring(0,j);
-if(!d){j++; if(j>w.length)d=true;}
-else{j--; if(j===0){d=false;i=(i+1)%words.length;}}
-},100);
+  /* Cursor */
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+  });
+  (function animRing(){
+    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,.interest-card,.learning-card,.stat-block').forEach(el=>{
+    el.addEventListener('mouseenter',()=>ring.classList.add('expand'));
+    el.addEventListener('mouseleave',()=>ring.classList.remove('expand'));
+  });
 
-const obs=new IntersectionObserver(entries=>{
-entries.forEach(e=>{
-if(e.isIntersecting)e.target.classList.add("show");
-});
-});
-document.querySelectorAll(".card").forEach(c=>obs.observe(c));
+  /* Typing hero */
+  const words=['Linux Enthusiast','C Programmer','Cybersecurity Learner','Chess Player','Badminton Enthusiast','Calculus Student'];
+  let wi=0,ci=0,del=false;
+  setInterval(()=>{
+    const w=words[wi];
+    document.getElementById('typing').textContent=w.substring(0,ci);
+    if(!del){ci++;if(ci>w.length)del=true;}
+    else{ci--;if(ci===0){del=false;wi=(wi+1)%words.length;}}
+  },100);
 
-const lines=[
-"$ whoami",
-"Utsab Hacket",
-"",
-"$ education",
-"Class 11 - NIST College",
-"",
-"$ GPA",
-"3.79",
-"",
-"$ hobbies",
-"Chess, Badminton",
-"",
-"$ interests",
-"Linux, C, Networking, Cybersecurity",
-"",
-"$ status",
-"Learning Every Day..."
-];
-let out="",idx=0;
-function typeTerminal(){
-if(idx<lines.length){
-out+=lines[idx]+"\n";
-document.getElementById("terminal").textContent=out;
-idx++;
-setTimeout(typeTerminal,400);
-}
-}
-typeTerminal();
+  /* Matrix rain SVG */
+  const chars='01アイウエオカキクケコサシスセソABCDEF';
+  const cols=18, rows=30;
+  let matrix=Array.from({length:cols},()=>({y:Math.random()*rows|0,speed:0.3+Math.random()*0.7}));
+  const mtext=document.getElementById('matrixText');
+  if(mtext){
+    function drawMatrix(){
+      let html='';
+      matrix.forEach((col,ci)=>{
+        col.y=(col.y+col.speed)%rows;
+        for(let r=0;r<8;r++){
+          const y=((col.y|0)+r)%rows;
+          const ch=chars[Math.random()*chars.length|0];
+          const opacity=r===0?0.9:Math.max(0,0.6-r*0.08);
+          const color=r===0?'#ffffff':'#00ff44';
+          html+=`<tspan x="${ci*11+6}" y="${y*14+14}" fill="${color}" opacity="${opacity}">${ch}</tspan>`;
+        }
+      });
+      mtext.innerHTML=html;
+      requestAnimationFrame(drawMatrix);
+    }
+    drawMatrix();
+  }
 
-const canvas=document.getElementById("matrix");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-const chars="01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const size=16;
-const cols=Math.floor(canvas.width/size);
-const drops=Array(cols).fill(1);
+  /* Terminal */
+  const lines=[
+    {type:'prompt',text:'utsab@nist:~$ whoami'},
+    {type:'out',text:'utsab_shah'},
+    {type:'blank'},
+    {type:'prompt',text:'utsab@nist:~$ cat education.txt'},
+    {type:'out',text:'School : NIST College, Kathmandu'},
+    {type:'out',text:'Grade  : Class 11'},
+    {type:'out',text:'GPA    : 3.79'},
+    {type:'blank'},
+    {type:'prompt',text:'utsab@nist:~$ ls ~/interests/'},
+    {type:'out',text:'linux/  kali/  c-programming/'},
+    {type:'out',text:'networking/  chess/  badminton/'},
+    {type:'blank'},
+    {type:'prompt',text:'utsab@nist:~$ echo $STATUS'},
+    {type:'out',text:'[✓] Learning every day...'},
+    {type:'blank'},
+    {type:'prompt',text:'utsab@nist:~$ _'},
+  ];
+  const termEl=document.getElementById('term-out');
+  let termHTML='', lineIdx=0;
+  function renderLine(){
+    if(lineIdx>=lines.length)return;
+    const l=lines[lineIdx++];
+    if(l.type==='blank'){ termHTML+='\n'; }
+    else if(l.type==='prompt'){
+      const p=l.text.indexOf('$ ');
+      termHTML+=`<span class="t-prompt">${l.text.substring(0,p+2)}</span>${l.text.substring(p+2)}\n`;
+    } else {
+      termHTML+=`<span class="t-out">${l.text}</span>\n`;
+    }
+    termEl.innerHTML=termHTML;
+    setTimeout(renderLine, l.type==='blank'?80:l.type==='prompt'?550:220);
+  }
+  const tObs=new IntersectionObserver(e=>{if(e[0].isIntersecting){renderLine();tObs.disconnect();}},{threshold:.25});
+  tObs.observe(document.querySelector('.terminal'));
 
-function draw(){
-ctx.fillStyle="rgba(5,8,22,0.08)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="#0f0";
-ctx.font=size+"px monospace";
-for(let i=0;i<drops.length;i++){
-const text=chars[Math.floor(Math.random()*chars.length)];
-ctx.fillText(text,i*size,drops[i]*size);
-if(drops[i]*size>canvas.height && Math.random()>0.975)drops[i]=0;
-drops[i]++;
-}
-requestAnimationFrame(draw);
-}
-draw();
+  /* Reveals */
+  const rObs=new IntersectionObserver(e=>{
+    e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');rObs.unobserve(en.target);}});
+  },{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>rObs.observe(el));
 </script>
 </body>
 </html>
